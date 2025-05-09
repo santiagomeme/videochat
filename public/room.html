@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sala de Chat</title>
+</head>
+<body>
+  <h1>Bienvenido a la sala</h1>
+  <p id="roomIdDisplay"></p>
+  <div id="messages"></div>
+  <input type="text" id="messageInput" placeholder="Escribe un mensaje">
+  <button id="sendMessage">Enviar</button>
+
+  <script>
+    // Obtener el parámetro 'roomId' de la URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const roomId = urlParams.get('roomId');
+
+    if (!roomId) {
+      alert('Error: No se encontró un ID de sala.');
+      window.location.href = '/';
+    }
+
+    // Mostrar el ID de la sala en la interfaz
+    document.getElementById('roomIdDisplay').textContent = `ID de la sala: ${roomId}`;
+
+    // Conexión al servidor WebSocket
+    const socket = new WebSocket('wss://shrouded-star-apple.glitch.me');
+
+    // Validar el acceso a la sala
+    fetch(`/api/validateRoom?roomId=${roomId}`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('No tienes acceso a esta sala.');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Acceso permitido:', data);
+        // Conectar al WebSocket
+        socket.send(JSON.stringify({ type: 'joinRoom', roomId: roomId }));
+      })
+      .catch(error => {
+        console.error('Error de validación:', error);
+        alert('No tienes permiso para acceder a esta sala.');
+        window.location.href = '/';
+      });
+
+    // Escuchar mensajes relacionados con la sala
+    socket.addEventListener('message', (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === 'roomMessage') {
+        console.log(`Mensaje en la sala ${roomId}:`, data.message);
+        // Mostrar el mensaje en la interfaz
+        const messagesDiv = document.getElementById('messages');
+        const messageElement = document.createElement('p');
+        messageElement.textContent = data.message;
+        messagesDiv.appendChild(messageElement);
+      }
+    });
+
+    // Manejo del botón "Enviar Mensaje"
+    document.getElementById('sendMessage').addEventListener('click', () => {
+      const messageInput = document.getElementById('messageInput');
+      const message = messageInput.value.trim();
+
+      if (message) {
+        // Enviar mensaje al servidor
+        socket.send(JSON.stringify({ type: 'roomMessage', roomId: roomId, message: message }));
+        messageInput.value = ''; // Limpiar el campo de entrada
+      }
+    });
+
+    // Manejo de errores del WebSocket
+    socket.addEventListener('error', (error) => {
+      console.error('Error en WebSocket:', error);
+    });
+
+    // Cerrar conexión cuando la página se recarga o cierra
+    window.addEventListener('beforeunload', () => {
+      socket.close();
+    });
+  </script>
+</body>
+</html>

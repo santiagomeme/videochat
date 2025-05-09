@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+   <!-- Firebase -->
+
+   <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app-compat.js"></script>
+   <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore-compat.js"></script>
+   <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script> <!-- ⚠️ IMPORTANTE -->
+   
+    
+    <title>Ingreso como Observador</title>
+  </head>
+  <body>
+    <h2>Ingresar a una Sala como Observador</h2>
+    <p>Ingresa el ID de la sala que te compartieron:</p>
+    <input type="text" id="roomIdInput" placeholder="Ingresa ID de la sala" />
+    <button id="joinRoomBtn">Unirse a la Sala</button>
+
+
+
+    <h2>Salas disponibles:</h2>
+    <div id="salasDisponibles"></div>
+
+    <button onclick="window.location.href='index.html'">Volver</button>
+
+    <script src="firebase-config.js"></script> <!-- 👈 Este archivo contiene tu config e inicialización -->
+
+    <script>
+      // Unirse a la sala con el ID ingresado manualmente
+      document.getElementById("joinRoomBtn").addEventListener("click", (e) => {
+        e.preventDefault();
+    
+        const roomId = document.getElementById("roomIdInput").value.trim();
+        if (!roomId) {
+          alert("Por favor ingresa un ID de sala");
+          return;
+        }
+    
+        // Redirige al observador con roomId y senderId
+        window.location.href = `observadores.html?roomId=${roomId}&senderId=observador123`;
+      });
+    </script>
+    
+    <script>
+      // Asegúrate de que firebase-config.js ya fue cargado antes de este script
+      const db = window.db; // ✅ Usamos la instancia ya inicializada
+      const contenedorSalas = document.getElementById("salasDisponibles");
+    
+      db.collection("salas")
+        .where("estado", "==", "activo")
+        .orderBy("creadoEn", "desc")
+        .onSnapshot((snapshot) => {
+          contenedorSalas.innerHTML = "";
+    
+          if (snapshot.empty) {
+            contenedorSalas.innerHTML = "<p>No hay salas activas disponibles.</p>";
+            return;
+          }
+    
+          snapshot.forEach((doc) => {
+            const sala = doc.data();
+            const roomId = doc.id;
+    
+            const div = document.createElement("div");
+            div.style.border = "1px solid #ccc";
+            div.style.padding = "10px";
+            div.style.marginBottom = "10px";
+    
+            div.innerHTML = `
+              <p><strong>Monitor:</strong> ${sala.monitor || 'No especificado'}</p>
+              <p><strong>ID de sala:</strong> ${roomId}</p>
+              <button onclick="unirseSala('${roomId}', '${sala.monitor || 'anónimo'}')">Unirse</button>
+            `;
+    
+            contenedorSalas.appendChild(div);
+          });
+        });
+    
+      function unirseSala(roomId, monitor) {
+        if (confirm(`¿Quieres unirte a la sala del monitor: ${monitor}?`)) {
+          window.location.href = `observadores.html?roomId=${roomId}&senderId=observador123`;
+        }
+      }
+    </script>
+    
+    
+
+    
+  <script src="salas-obser.js"></script>
+
+  </body>
+</html>
+

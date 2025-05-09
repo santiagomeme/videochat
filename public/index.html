@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro e Inicio de Sesión</title>
+
+  <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script> <!-- ⚠️ IMPORTANTE -->
+  
+   
+  <link rel="stylesheet" href="style.css">
+
+
+</head>
+<body>
+  <h1>Registro e Inicio de Sesión</h1>
+
+
+  <a href="observadores.html">Ir a Observadores</a>
+  <a href="monitores.html">Ir a Monitores</a>
+  
+
+  <div id="authControls">
+    <input type="text" id="emailInput" placeholder="Correo electrónico">
+    <input type="password" id="passwordInput" placeholder="Contraseña">
+    <div>
+      <label><input type="radio" name="role" value="monitor"> Monitor</label>
+      <label><input type="radio" name="role" value="observer"> Observador</label>
+    </div>
+    <button id="registerButton">Registrarse</button>
+    <button id="loginButton">Iniciar Sesión</button>
+  </div>
+
+  <script src="firebase-config.js"></script>
+  <script src="roles.js"></script>
+
+</body>
+</html>

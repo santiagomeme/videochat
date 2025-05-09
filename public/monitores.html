@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Interfaz del Monitor</title>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header style="display: flex; justify-content: space-between; align-items: center; padding: 10px;">
+    <h1>Bienvenido, Monitor</h1>
+    <button id="logoutButton">Cerrar Sesión</button>
+    <button onclick="window.location.href='index.html'">Volver</button>
+  </header>
+
+  <main style="padding: 20px;">
+    <section id="monitorControls">
+      <h2>Controles</h2>
+      <button id="startBroadcast">Iniciar transmisión</button>
+      <p>ID de sala: <strong id="roomIdText"></strong></p>
+      <p>
+        Link para observadores:
+        <input type="text" id="shareLink" readonly style="width: 100%; padding: 5px;"/>
+      </p>
+    </section>
+
+    <section>
+      <h2>Vista previa</h2>
+      <video id="localVideo" autoplay muted playsinline style="width: 100%; max-width: 600px; border: 1px solid #ccc;"></video>
+    </section>
+  </main>
+
+
+  <script src="firebase-config.js"></script> <!-- 👈 Este archivo contiene tu config e inicialización -->
+    <script src="iceServers.js"></script>
+    <script src="monitor.js"></script>
+
+
+  <script>
+    function getQueryParam(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      const roomId = getQueryParam("roomId");
+      const monitor = getQueryParam("monitor");
+
+      if (!roomId || !monitor) {
+        alert("❌ Faltan datos de la sala.");
+        return;
+      }
+
+      document.getElementById("roomIdText").textContent = roomId;
+      document.getElementById("shareLink").value = `https://myvideofree.web.app/observadores.html?roomId=${roomId}&senderId=observador123&monitor=${encodeURIComponent(monitor)}`;
+
+      const videoElement = document.getElementById("localVideo");
+      const btnStart = document.getElementById("startBroadcast");
+
+      let localStream;
+      let socket;
+      let isStreaming = false;
+
+      btnStart.addEventListener("click", async () => {
+        if (!isStreaming) {
+          btnStart.textContent = "Iniciando...";
+          try {
+            localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            videoElement.srcObject = localStream;
+
+            // Enviar señal por WebSocket
+            socket = new WebSocket("wss://shrouded-star-apple.glitch.me"); // Reemplaza por tu servidor WebSocket real
+            socket.onopen = () => {
+              console.log("🟢 Conectado al WebSocket");
+              socket.send(JSON.stringify({
+                type: "joinRoom",
+                roomId: roomId,
+                senderId: monitor,
+                role: "monitor"
+              }));
+            };
+
+            socket.onmessage = (event) => {
+              const message = JSON.parse(event.data);
+              console.log("📩 Mensaje recibido:", message);
+            };
+
+            isStreaming = true;
+            btnStart.textContent = "Detener transmisión";
+          } catch (err) {
+            console.error("❌ Error al acceder a la cámara/micrófono:", err);
+            alert("No se pudo acceder a tu cámara o micrófono.");
+            btnStart.textContent = "Iniciar transmisión";
+          }
+        } else {
+          // Detener transmisión
+          localStream.getTracks().forEach(track => track.stop());
+          videoElement.srcObject = null;
+
+          if (socket && socket.readyState === WebSocket.OPEN) {
+            socket.close();
+          }
+
+          isStreaming = false;
+          btnStart.textContent = "Iniciar transmisión";
+          console.log("🛑 Transmisión detenida.");
+        }
+      });
+
+      document.getElementById("logoutButton").addEventListener("click", () => {
+        firebase.auth().signOut().then(() => {
+          window.location.href = "index.html";
+        });
+      });
+    });
+  </script>
+</body>
+</html>
