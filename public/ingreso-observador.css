@@ -1,0 +1,103 @@
+ body {
+      background: radial-gradient(ellipse at center, #0d0d0d 0%, #000000 100%);
+      color: gold;
+  font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .contenedor {
+      max-width: 700px;
+      margin: 60px auto;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 30px;
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      box-shadow:
+        0 0 20px rgba(255, 215, 0, 0.5),
+        0 0 40px rgba(255, 215, 0, 0.3);
+    }
+
+    h2 {
+      color: silver;
+      text-align: center;
+    }
+
+    #busquedaSala {
+      width: 100%;
+      padding: 10px;
+      margin: 20px 0;
+      border-radius: 8px;
+      border: none;
+      background-color: #1a1a1a;
+      color: gold;
+      font-size: 16px;
+    }
+
+    .sala-card {
+      background-color: rgba(20, 20, 20, 0.8);
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
+    }
+
+    .sala-card h3 {
+      margin-top: 0;
+      color: gold;
+    }
+
+    .titulo {
+      color: silver;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    .sala-card button {
+      margin-top: 10px;
+      background-color: transparent;
+      color: gold;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+      transition: 0.3s ease;
+    }
+
+    .sala-card button:hover {
+      background-color: gold;
+      color: black;
+    }
+
+    .volver {
+      display: block;
+      margin: 30px auto 0;
+      background: transparent;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+    }
+
+    .estado-icono {
+      font-size: 18px;
+      margin-left: 8px;
+      cursor: default;
+    }
+
+
+    .barra-contador {
+  color: gold;
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 12px;
+  padding: 10px 20px;
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: bold;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+  text-shadow: 0 0 6px gold;
+}

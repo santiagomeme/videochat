@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const socket = new WebSocket("wss://shrouded-star-apple.glitch.me");
+  const socket = new WebSocket("wss://e6e14acd-d62c-4d98-b810-643a81d486b5-00-2nju91dv3rww3.worf.replit.dev/");
 
   // Obtener elementos del DOM
   const btnCrear = document.getElementById("createRoom");
@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const msg = JSON.parse(event.data);
 
       if (msg.type === "roomCreated" && msg.roomId) {
-        console.log("✅ Sala creada con ID:", msg.roomId);
+        console.log("✅ Sala creada en salas.js con ID:", msg.roomId);
 
         // Mostrar info de la sala
         salaInfo.style.display = "block";

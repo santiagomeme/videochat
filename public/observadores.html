@@ -12,27 +12,32 @@
     <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script> <!-- ⚠️ IMPORTANTE -->
 
-    <link rel="stylesheet" href="style.css" />
-  
+    <link rel="stylesheet" href="monitor.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
 </head>
-<body>
-  <h1>Bienvenido, Observador</h1>
-  <h2>Conectado como Observador</h2>
+<body>  <div class="contenedor">
+  <header class="encabezado">
+    <h1>Bienvenido, Observador</h1>
+    <h2>Conectado como Observador</h2>
+  </header>
 
-  <div id="salaInfo">
-    <p><strong>ID de sala:</strong> <span id="roomIdText"></span></p>
-    <p><strong>Monitor:</strong> <span id="monitorName">Desconocido</span></p>
-  </div>
+  <section class="infoSala">
+    <p><span class="titulo">ID de sala:</span> <span class="valor" id="roomIdText">---</span></p>
+    <p><span class="titulo">Monitor:</span> <span class="valor" id="monitorName">Desconocido</span></p>
+  </section>
 
-  <div id="videos">
-    <p><strong>Video del monitor:</strong></p>
+  <section class="videoSection">
+    <p class="titulo">Video del monitor:</p>
     <video id="remoteVideo" autoplay playsinline controls></video>
-  </div>
+    <img id="monitorScreenshot" alt="Captura" />
+  </section>
 
-  <div id="captura">
-    <p><strong>Captura de pantalla:</strong></p>
-    <img id="screenshotImage" alt="Captura del monitor" />
-  </div>
+  <section class="botones">
+    <button class="btn-dorado" onclick="window.location.href='index.html'">🏠 Volver</button>
+    <button class="btn-dorado" onclick="window.location.href='ingreso-observador.html'">🎥 Ver Salas</button>
+  </section>
+</div>
 
 
   <script src="firebase-config.js"></script> <!-- 👈 Este archivo contiene tu config e inicialización -->
@@ -41,70 +46,6 @@
     <script src="observadorRTC.js"></script>
 
 
-
-
-  <script>
-    // Función para obtener parámetros de la URL
-    function getQueryParam(param) {
-      const urlParams = new URLSearchParams(window.location.search);
-      return urlParams.get(param);
-    }
-
-    document.addEventListener("DOMContentLoaded", () => {
-      const roomId = getQueryParam("roomId");
-      const senderId = getQueryParam("senderId");
-
-      if (!roomId || !senderId) {
-        alert("❌ Faltan parámetros.");
-        return;
-      }
-
-      // Mostrar ID de sala
-      document.getElementById("roomIdText").textContent = roomId;
-
-      // Conexión al WebSocket
-      const socket = new WebSocket("wss://shrouded-star-apple.glitch.me");
-
-      socket.onopen = () => {
-        console.log("👁️ Observador conectado a WebSocket");
-        socket.send(JSON.stringify({
-          type: "joinRoom",
-          roomId,
-          senderId
-        }));
-      };
-
-      socket.onmessage = (event) => {
-        const msg = JSON.parse(event.data);
-        console.log("📩 Mensaje recibido:", msg);
-
-        // Mostrar nombre del monitor
-        if (msg.type === "monitorInfo" && msg.roomId === roomId) {
-          document.getElementById("monitorName").textContent = msg.monitorName || "Desconocido";
-        }
-
-        // Mostrar captura de pantalla
-        if (msg.type === "monitorScreenshot" && msg.roomId === roomId) {
-          const imgElement = document.getElementById("screenshotImage");
-          imgElement.src = msg.imageData; // base64
-        }
-
-        // Mostrar video remoto (opcional, si usas WebRTC o streaming)
-        if (msg.type === "monitorStream" && msg.roomId === roomId) {
-          const videoElement = document.getElementById("remoteVideo");
-          videoElement.srcObject = msg.stream; // Solo si envías stream real
-        }
-      };
-
-      socket.onerror = (error) => {
-        console.error("❌ Error en WebSocket:", error);
-      };
-
-      socket.onclose = () => {
-        console.warn("🔌 Conexión WebSocket cerrada");
-      };
-    });
-  </script>
   
 </body>
 </html>

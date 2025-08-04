@@ -1,0 +1,125 @@
+body {
+  background: radial-gradient(ellipse at center, #0d0d0d 0%, #000000 100%);
+  animation: fondo 10s ease infinite alternate;
+  font-family: 'Poppins', sans-serif;
+  color: gold;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+@keyframes fondo {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+.main-container {
+  text-align: center;
+  width: 100%;
+  padding: 20px;
+}
+
+.auth-box {
+  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 20px;
+  padding: 40px 30px;
+  margin: 30px auto 0;
+  max-width: 400px;
+  box-shadow:
+    0 0 20px rgba(255, 215, 0, 0.5),
+    0 0 40px rgba(255, 215, 0, 0.3),
+    0 0 80px rgba(255, 215, 0, 0.2);
+}
+
+h1 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 32px;
+  margin-top: 0;
+  color: gold;
+}
+
+.slogan {
+  color: silver;
+  font-size: 18px;
+  margin-top: 10px;
+  text-shadow:
+    0 0 10px rgba(255, 215, 0, 0.4),
+    0 0 20px rgba(255, 215, 0, 0.2);
+}
+
+.auth-box h2 {
+  color: silver;
+  margin-bottom: 20px;
+}
+
+.auth-box input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  border: none;
+  background-color: #1a1a1a;
+  color: gold;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+.auth-box input::placeholder {
+  color: #d4af37b4;
+}
+
+.btn-group {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-group button {
+  background: transparent;
+  border: none;
+  color: gold;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow:
+    0 0 10px rgba(255, 215, 0, 0.6),
+    0 0 30px rgba(255, 215, 0, 0.4),
+    0 0 50px rgba(255, 215, 0, 0.2);
+}
+
+.btn-group button:hover {
+  background-color: gold;
+  color: black;
+}
+
+.rol-selector {
+  margin-top: 15px;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.rol-selector label {
+  color: silver;
+  font-weight: bold;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.rol-selector input[type="radio"] {
+  accent-color: gold;
+  transform: scale(1.2);
+  margin-right: 6px;
+  cursor: pointer;
+}
+
+

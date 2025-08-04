@@ -28,13 +28,14 @@
       document.getElementById("salaInfo").style.display = "block";
 
       // BOTÓN para ir a monitores con los datos en la URL
-      const btnIr = document.createElement("button");
-      btnIr.textContent = "Ir a transmisión";
-      btnIr.style.marginTop = "20px";
-      btnIr.onclick = () => {
-        window.location.href = `monitores.html?roomId=${roomId}&monitor=${encodeURIComponent(monitor)}`;
-      };
-      document.getElementById("salaInfo").appendChild(btnIr);
+     const btnIr = document.createElement("button");
+btnIr.textContent = "Ir a transmisión";
+btnIr.className = "btn-dorado"; // ✅ Aplica estilo
+btnIr.style.marginTop = "20px";
+btnIr.onclick = () => {
+  window.location.href = `monitores.html?roomId=${roomId}&monitor=${encodeURIComponent(monitor)}`;
+};
+document.getElementById("salaInfo").appendChild(btnIr);
 
     })
     .catch((error) => {
@@ -43,3 +44,22 @@
     });
   });
 
+//permitir guardar el ui del monitor en firestore para reconexiones en la misma sala
+firebase.auth().onAuthStateChanged(user => {
+  if (user) {
+    const sala = {
+      monitor: nombreMonitor,
+      estado: "activo",
+      creadoEn: firebase.firestore.FieldValue.serverTimestamp(),
+      uid: user.uid // ← Agrega el UID del monitor
+    };
+
+    db.collection("salas").doc(idGenerado).set(sala)
+      .then(() => {
+        console.log("✅ Sala creada con UID del monitor");
+        window.location.href = `monitores.html?roomId=${idGenerado}&monitor=${nombreMonitor}`;
+      });
+  } else {
+    alert("Debes iniciar sesión para crear una sala.");
+  }
+});

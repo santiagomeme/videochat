@@ -10,115 +10,92 @@
   <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script>
 
-  <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="monitor.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
 </head>
 <body>
-  <header style="display: flex; justify-content: space-between; align-items: center; padding: 10px;">
+<div class="contenedor">
+  <header class="encabezado">
     <h1>Bienvenido, Monitor</h1>
-    <button id="logoutButton">Cerrar Sesión</button>
-    <button onclick="window.location.href='index.html'">Volver</button>
+    <div class="botones-header">
+      <button class="btn-dorado" id="stopBroadcast">⏹ Detener transmisión</button>
+      <button class="btn-dorado" onclick="window.location.href='index.html'">🏠 Volver</button>
+    </div>
   </header>
 
-  <main style="padding: 20px;">
-    <section id="monitorControls">
-      <h2>Controles</h2>
-      <button id="startBroadcast">Iniciar transmisión</button>
-      <p>ID de sala: <strong id="roomIdText"></strong></p>
-      <p>
-        Link para observadores:
-        <input type="text" id="shareLink" readonly style="width: 100%; padding: 5px;"/>
-      </p>
+  <main>
+    <section id="monitorControls" class="formulario">
+      <h2 class="titulo">Tra</h2>
+      <button class="btn-dorado" id="startBroadcast">🎥 Iniciar transmisión</button>
+
+      <p><span class="titulo">Monitor:</span> <span class="valor" id="monitorNombre">Desconocido</span></p>
+      <p><span class="titulo">ID de sala:</span> <span class="valor" id="roomIdText">---</span></p>
+
+      <p class="titulo">Link para observadores:</p>
+      <input class="input-dorado" id="shareLink" type="text" readonly />
+      <button class="btn-dorado" id="copiarEnlaceBtn">📋 Copiar enlace</button>
+      <span id="copiarConfirmacion" class="valor" style="display:block; margin-top: 5px;"></span>
     </section>
 
-    <section>
-      <h2>Vista previa</h2>
-      <video id="localVideo" autoplay muted playsinline style="width: 100%; max-width: 600px; border: 1px solid #ccc;"></video>
+    <section class="videoSection">
+      <h2 class="titulo">Vista previa</h2>
+      <video id="localVideo" autoplay muted playsinline></video>
+    </section>
+
+    <section class="botones">
+      <button class="btn-dorado" id="capturarBtn">📸 Capturar Imagen</button>
     </section>
   </main>
+
+  <canvas id="capturaCanvas" style="display:none;"></canvas>
+</div>
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // 1. Obtener parámetros de la URL
+    const params = new URLSearchParams(window.location.search);
+    const roomId = params.get("roomId");
+    const monitor = params.get("monitor");
+
+    // 2. Generar link
+    const linkGenerado = `https://myvideofree.web.app/observadores.html?roomId=${roomId}&senderId=observador123`;
+
+    // 3. Asignar a los elementos del DOM
+    const roomIdText = document.getElementById("roomIdText");
+    const shareInput = document.getElementById("shareLink");
+    const monitorNombre = document.getElementById("monitorNombre");
+    const copiarBtn = document.getElementById("copiarEnlaceBtn");
+    const confirmacion = document.getElementById("copiarConfirmacion");
+
+    if (roomIdText) roomIdText.textContent = roomId || "---";
+    if (shareInput) shareInput.value = linkGenerado;
+    if (monitorNombre) monitorNombre.textContent = monitor || "Desconocido";
+
+    // 4. Lógica para copiar al portapapeles
+    if (copiarBtn) {
+      copiarBtn.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(shareInput.value);
+          confirmacion.textContent = "¡Enlace copiado!";
+          confirmacion.style.color = "gold";
+          setTimeout(() => (confirmacion.textContent = ""), 2000);
+        } catch (err) {
+          console.error("❌ Error al copiar:", err);
+          confirmacion.textContent = "Error al copiar";
+          confirmacion.style.color = "red";
+        }
+      });
+    }
+  });
+</script>
+
 
 
   <script src="firebase-config.js"></script> <!-- 👈 Este archivo contiene tu config e inicialización -->
     <script src="iceServers.js"></script>
     <script src="monitor.js"></script>
 
-
-  <script>
-    function getQueryParam(param) {
-      const urlParams = new URLSearchParams(window.location.search);
-      return urlParams.get(param);
-    }
-
-    document.addEventListener("DOMContentLoaded", async () => {
-      const roomId = getQueryParam("roomId");
-      const monitor = getQueryParam("monitor");
-
-      if (!roomId || !monitor) {
-        alert("❌ Faltan datos de la sala.");
-        return;
-      }
-
-      document.getElementById("roomIdText").textContent = roomId;
-      document.getElementById("shareLink").value = `https://myvideofree.web.app/observadores.html?roomId=${roomId}&senderId=observador123&monitor=${encodeURIComponent(monitor)}`;
-
-      const videoElement = document.getElementById("localVideo");
-      const btnStart = document.getElementById("startBroadcast");
-
-      let localStream;
-      let socket;
-      let isStreaming = false;
-
-      btnStart.addEventListener("click", async () => {
-        if (!isStreaming) {
-          btnStart.textContent = "Iniciando...";
-          try {
-            localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-            videoElement.srcObject = localStream;
-
-            // Enviar señal por WebSocket
-            socket = new WebSocket("wss://shrouded-star-apple.glitch.me"); // Reemplaza por tu servidor WebSocket real
-            socket.onopen = () => {
-              console.log("🟢 Conectado al WebSocket");
-              socket.send(JSON.stringify({
-                type: "joinRoom",
-                roomId: roomId,
-                senderId: monitor,
-                role: "monitor"
-              }));
-            };
-
-            socket.onmessage = (event) => {
-              const message = JSON.parse(event.data);
-              console.log("📩 Mensaje recibido:", message);
-            };
-
-            isStreaming = true;
-            btnStart.textContent = "Detener transmisión";
-          } catch (err) {
-            console.error("❌ Error al acceder a la cámara/micrófono:", err);
-            alert("No se pudo acceder a tu cámara o micrófono.");
-            btnStart.textContent = "Iniciar transmisión";
-          }
-        } else {
-          // Detener transmisión
-          localStream.getTracks().forEach(track => track.stop());
-          videoElement.srcObject = null;
-
-          if (socket && socket.readyState === WebSocket.OPEN) {
-            socket.close();
-          }
-
-          isStreaming = false;
-          btnStart.textContent = "Iniciar transmisión";
-          console.log("🛑 Transmisión detenida.");
-        }
-      });
-
-      document.getElementById("logoutButton").addEventListener("click", () => {
-        firebase.auth().signOut().then(() => {
-          window.location.href = "index.html";
-        });
-      });
-    });
-  </script>
 </body>
 </html>

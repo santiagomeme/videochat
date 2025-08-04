@@ -1,13 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const socket = new WebSocket("wss://shrouded-star-apple.glitch.me");
+const socket = new WebSocket("wss://e6e14acd-d62c-4d98-b810-643a81d486b5-00-2nju91dv3rww3.worf.replit.dev/");
 
   const urlParams = new URLSearchParams(window.location.search);
   const roomId = urlParams.get("roomId");
   const senderId = urlParams.get("senderId") || "observer_" + Math.floor(Math.random() * 1000);
 
   if (!roomId) {
-    alert("❌ No se especificó ningún ID de sala.");
-    return;
+
   }
 
   socket.addEventListener("open", () => {

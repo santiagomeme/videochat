@@ -1,17 +1,35 @@
 document.addEventListener("DOMContentLoaded", () => {
   // Crear conexión WebSocket
-  const socket = new WebSocket("wss://shrouded-star-apple.glitch.me");
+  const socket = new WebSocket("wss://e6e14acd-d62c-4d98-b810-643a81d486b5-00-2nju91dv3rww3.worf.replit.dev/");
 
   // Obtener parámetros desde la URL
   const urlParams = new URLSearchParams(window.location.search);
   const roomId = urlParams.get("roomId");
-  const senderId = urlParams.get("senderId") || `observer_${Math.floor(Math.random() * 1000)}`;
+  const senderId = urlParams.get("senderId") || `observer_${Math.floor(Math.random() * 10000)}`;
+  const observerId = senderId; // ✅ ya puedes usarlo después de declararlo
 
-  // Validar si se proporcionó roomId
-  if (!roomId) {
-    alert("❌ No se especificó ningún ID de sala.");
-    return;
-  }
+
+// Mostrar el nombre del monitor desde Firestore
+if (firebase && firebase.firestore && roomId) {
+  const db = firebase.firestore();
+  db.collection("salas").doc(roomId).get()
+    .then(doc => {
+      if (doc.exists) {
+        const data = doc.data();
+        const monitorText = document.getElementById("monitorName");
+        if (monitorText) {
+          monitorText.textContent = data.monitor || "Desconocido";
+        }
+      } else {
+        console.warn("⚠️ Sala no encontrada en Firestore");
+      }
+    })
+    .catch(err => {
+      console.error("❌ Error al leer el nombre del monitor:", err);
+    });
+}
+
+
 
   // Cuando se abre la conexión
   socket.addEventListener("open", () => {
@@ -33,19 +51,16 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = JSON.parse(event.data);
       console.log("📩 Mensaje recibido:", data);
 
-      // Mostrar el ID de la sala
       const roomIdText = document.getElementById("roomIdText");
       if (roomIdText) {
         roomIdText.textContent = roomId;
       }
 
-      // Mostrar el nombre del monitor si se recibe
       const monitorText = document.getElementById("monitorName");
       if (monitorText && data.senderId) {
         monitorText.textContent = data.senderId;
       }
 
-      // Mostrar la captura de pantalla si existe
       if (data.screenshot) {
         const screenshotImg = document.getElementById("monitorScreenshot");
         if (screenshotImg) {
@@ -58,7 +73,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Cierre de conexión
+const roomIdText = document.getElementById("roomIdText");
+if (roomIdText && roomId) {
+  roomIdText.textContent = roomId;
+}
+
+
   socket.addEventListener("close", () => {
     console.log("🔌 Conexión cerrada");
   });
@@ -66,4 +86,6 @@ document.addEventListener("DOMContentLoaded", () => {
   socket.addEventListener("error", (err) => {
     console.error("⚠️ Error de WebSocket:", err);
   });
+
+  console.log("🧪 ID del observador:", senderId);
 });

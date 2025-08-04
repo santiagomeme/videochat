@@ -4,40 +4,37 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Crear Sala</title>
-    <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="crearSala.css">
   <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script> <!-- ⚠️ IMPORTANTE -->
 
- 
+ <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
 
   </head>
-  <body>
-    
+  <body><div class="contenedor">
+  <div class="encabezado">
+    <h1>Crear nueva Sala</h1>
+    <button class="btn-volver" onclick="window.location.href='index.html'">Volver</button>
+  </div>
 
-    <header>
-      <h1>Crear nueva Sala</h1>
-      <button onclick="window.location.href='index.html'">Volver</button>
-    </header>
+  <div class="formulario">
+    <label for="monitorName" class="titulo">Tu nombre:</label>
+    <input id="monitorName" class="input-dorado" placeholder="Nombre del monitor" />
 
-    <main style="max-width: 500px; margin: auto; padding: 20px">
-      <label for="monitorName"><strong>Tu nombre:</strong></label>
-      <input
-        id="monitorName"
-        placeholder="Nombre del monitor"
-        style="width: 100%; padding: 8px; margin-bottom: 20px"
-      />
+    <button id="createRoom" class="btn-dorado">Crear Sala</button>
 
-      <button id="createRoom" style="width: 100%; padding: 10px">Crear Sala</button>
+    <div id="salaInfo" class="sala-info" style="display: none;">
+      <p class="titulo">🆔 ID de Sala: <span class="valor" id="roomIdText"></span></p>
+      <p class="titulo">🔗 Link para compartir:</p>
+      <input id="shareLink" readonly class="input-dorado" />
+    </div>
+  </div>
+</div>
 
-      <div id="salaInfo" style="margin-top: 20px; display: none;">
-        <p>🆔 ID de Sala: <span id="roomIdText"></span></p>
-        <p>🔗 Link para compartir:</p>
-        <input id="shareLink" readonly style="width: 100%; padding: 8px" />
-      </div>
-      
-    </main>
+
 
    <!-- Tu configuración de Firebase -->
    <script defer src="firebase-config.js"></script>

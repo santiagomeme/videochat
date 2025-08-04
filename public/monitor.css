@@ -1,0 +1,127 @@
+body {
+  background: radial-gradient(ellipse at center, #0d0d0d 0%, #000000 100%);
+  animation: fondo 10s ease infinite alternate;
+  font-family: 'Poppins', sans-serif;
+  color: gold;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+@keyframes fondo {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+.contenedor {
+  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 20px;
+  padding: 40px 30px;
+  width: 90%;
+  max-width: 700px;
+  box-shadow:
+    0 0 20px rgba(255, 215, 0, 0.5),
+    0 0 40px rgba(255, 215, 0, 0.3),
+    0 0 80px rgba(255, 215, 0, 0.2);
+}
+
+.encabezado {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+
+.encabezado h1 {
+  color: gold;
+  font-size: 28px;
+  margin: 0;
+}
+
+.botones-header {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.titulo {
+  color: silver;
+  font-weight: bold;
+  font-size: 20px;
+  text-shadow:
+    0 0 5px #c0c0c0,
+    0 0 10px #dcdcdc,
+    0 0 15px #ffffff;
+}
+
+
+.valor {
+  color: gold;
+  font-weight: bold;
+}
+
+.input-dorado {
+  background-color: #1a1a1a;
+  border: none;
+  border-radius: 8px;
+  padding: 10px;
+  color: gold;
+  width: 100%;
+  font-size: 16px;
+}
+
+.input-dorado::placeholder {
+  color: #d4af37b4;
+}
+
+.btn-dorado {
+  background: transparent;
+  border: none;
+  color: rgb(255, 255, 255);
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 10px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  box-shadow:
+    0 0 10px rgba(255, 215, 0, 0.6),
+    0 0 30px rgba(255, 215, 0, 0.4),
+    0 0 50px rgba(255, 215, 0, 0.2);
+}
+
+.btn-dorado:hover {
+  background-color: gold;
+  color: black;
+}
+
+.videoSection {
+  margin-top: 30px;
+  text-align: center;
+}
+
+video {
+  width: 100%;
+  max-width: 100%;
+  border-radius: 10px;
+  margin-top: 10px;
+  box-shadow:
+    0 0 20px rgba(255, 215, 0, 0.4),
+    0 0 40px rgba(255, 215, 0, 0.2);
+}
+
+.botones {
+  margin-top: 30px;
+  text-align: center;
+}

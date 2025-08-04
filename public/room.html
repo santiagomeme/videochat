@@ -6,7 +6,7 @@
   <title>Sala de Chat</title>
 </head>
 <body>
-  <h1>Bienvenido a la sala</h1>
+  <h1>Bienvenido a la sala room.html</h1>
   <p id="roomIdDisplay"></p>
   <div id="messages"></div>
   <input type="text" id="messageInput" placeholder="Escribe un mensaje">
@@ -18,7 +18,7 @@
     const roomId = urlParams.get('roomId');
 
     if (!roomId) {
-      alert('Error: No se encontró un ID de sala.');
+      alert('Error: No se encontró un ID de sala  room.html.');
       window.location.href = '/';
     }
 
@@ -26,7 +26,7 @@
     document.getElementById('roomIdDisplay').textContent = `ID de la sala: ${roomId}`;
 
     // Conexión al servidor WebSocket
-    const socket = new WebSocket('wss://shrouded-star-apple.glitch.me');
+const socket = new WebSocket("wss://e6e14acd-d62c-4d98-b810-643a81d486b5-00-2nju91dv3rww3.worf.replit.dev/");
 
     // Validar el acceso a la sala
     fetch(`/api/validateRoom?roomId=${roomId}`)

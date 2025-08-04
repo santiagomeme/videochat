@@ -9,32 +9,45 @@
   <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script> <!-- ⚠️ IMPORTANTE -->
   
-   
-  <link rel="stylesheet" href="style.css">
+   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="index.css">
 
 
 </head>
 <body>
-  <h1>Registro e Inicio de Sesión</h1>
+   <div class="main-container">
+    <h1>Bienvenido</h1>
+    <p class="slogan">Tu espacio de transmisión y observación en tiempo real</p>
 
+    <div class="auth-box">
+      <h2>Registro / Inicio</h2>
 
-  <a href="observadores.html">Ir a Observadores</a>
-  <a href="monitores.html">Ir a Monitores</a>
-  
+      <input type="text" id="emailInput" placeholder="Correo electrónico">
+      <input type="password" id="passwordInput" placeholder="Contraseña">
 
-  <div id="authControls">
-    <input type="text" id="emailInput" placeholder="Correo electrónico">
-    <input type="password" id="passwordInput" placeholder="Contraseña">
-    <div>
-      <label><input type="radio" name="role" value="monitor"> Monitor</label>
-      <label><input type="radio" name="role" value="observer"> Observador</label>
+   
+
+      <div class="btn-group">
+        <button id="registerButton">Registrarse</button>
+        <button id="loginButton">Iniciar Sesión</button>
+      </div>
+
+    <div class="rol-selector">
+  <label>
+    <input type="radio" name="role" value="monitor"> Monitor
+  </label>
+  <label>
+    <input type="radio" name="role" value="observer"> Observador
+  </label>
+</div>
     </div>
-    <button id="registerButton">Registrarse</button>
-    <button id="loginButton">Iniciar Sesión</button>
   </div>
 
   <script src="firebase-config.js"></script>
   <script src="roles.js"></script>
+
+
 
 </body>
 </html>
