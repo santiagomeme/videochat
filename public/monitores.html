@@ -18,6 +18,8 @@
 <div class="contenedor">
   <header class="encabezado">
     <h1>Bienvenido, Monitor</h1>
+    <div id="estadoSesion" style="font-size: 14px; margin-top: 10px; color: #aaa;"></div>
+
     <div class="botones-header">
       <button class="btn-dorado" id="stopBroadcast">⏹ Detener transmisión</button>
       <button class="btn-dorado" onclick="window.location.href='index.html'">🏠 Volver</button>
@@ -27,7 +29,7 @@
   <main>
     <section id="monitorControls" class="formulario">
       <h2 class="titulo">Tra</h2>
-      <button class="btn-dorado" id="startBroadcast">🎥 Iniciar transmisión</button>
+      <button type="button" class="btn-dorado" id="startBroadcast">🎥 Iniciar transmisión</button>
 
       <p><span class="titulo">Monitor:</span> <span class="valor" id="monitorNombre">Desconocido</span></p>
       <p><span class="titulo">ID de sala:</span> <span class="valor" id="roomIdText">---</span></p>
@@ -51,6 +53,16 @@
   <canvas id="capturaCanvas" style="display:none;"></canvas>
 </div>
 
+<div class="panel-observadores">
+  <h3>👁️ Observadores Conectados: <span id="totalObservadores">0</span></h3>
+  <ul id="listaObservadores"></ul>
+</div>
+
+
+
+ <script defer src="firebase-config.js"></script> <!-- 👈 Este archivo contiene tu config e inicialización -->
+    <script defer src="iceServers.js"></script>
+    <script defer src="monitor.js"></script>
 
 <script>
   document.addEventListener("DOMContentLoaded", () => {
@@ -90,12 +102,25 @@
     }
   });
 </script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+
+//mostrar en pantalla el nombe de si mismo con el q se registro
+firebase.auth().onAuthStateChanged(user => {
+  const estadoSesion = document.getElementById("estadoSesion");
+  if (user) {
+    estadoSesion.textContent = `✅ Autenticado como: ${user.displayName || "Usuario"} (UID: ${user.uid})`;
+    estadoSesion.style.color = "green";
+  } else {
+    estadoSesion.textContent = "❌ No autenticado. Es necesario iniciar sesión.";
+    estadoSesion.style.color = "red";
+  }
+});
+  });
+</script>
 
 
-
-  <script src="firebase-config.js"></script> <!-- 👈 Este archivo contiene tu config e inicialización -->
-    <script src="iceServers.js"></script>
-    <script src="monitor.js"></script>
+ 
 
 </body>
 </html>

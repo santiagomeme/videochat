@@ -12,10 +12,14 @@ const firebaseConfig = {
   appId: "1:970137896310:web:bcb2e58f84ba82872c6657",
   measurementId: "G-T9P73LW23Z"
 };
+// ✅ Asegurarse de no inicializar más de una vez
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+  console.log("🔥 Firebase inicializado");
+} else {
+  console.log("⚠️ Firebase ya estaba inicializado");
+}
 
-
-// Inicializa Firebase
-firebase.initializeApp(firebaseConfig);
 
 
 

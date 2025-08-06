@@ -19,7 +19,9 @@
 <body>  <div class="contenedor">
   <header class="encabezado">
     <h1>Bienvenido, Observador</h1>
-    <h2>Conectado como Observador</h2>
+    <h2>👤 Observador: <span id="observerName"></span></h2>
+
+<div id="estadoSesion" style="font-size: 14px; margin-top: 10px; color: #aaa;"></div>
   </header>
 
   <section class="infoSala">
@@ -37,6 +39,10 @@
     <button class="btn-dorado" onclick="window.location.href='index.html'">🏠 Volver</button>
     <button class="btn-dorado" onclick="window.location.href='ingreso-observador.html'">🎥 Ver Salas</button>
   </section>
+</div>
+<div id="panelObservadores" style="padding: 10px; border: 1px solid #ccc; margin-top: 20px;">
+  <h3>🧍‍♂️ Observadores conectados (<span id="totalObservadores">0</span>)</h3>
+  <ul id="listaObservadores"></ul>
 </div>
 
 

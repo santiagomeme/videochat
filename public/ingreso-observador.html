@@ -11,152 +11,38 @@
 
   <link rel="stylesheet" href="ingreso-observador.css">
     <title>Ingreso como Observador</title>
-  </head>
-  <body>
-    <div class="contenedor">
+  </head><body>
+  <!-- Estado de autenticación -->
+  <div id="estadoSesion" style="font-size: 14px; margin-top: 10px; color: #aaa;"></div>
+  <button class="volver" onclick="window.location.href='index.html'">🔙 Volver al inicio</button>
+
+  <div class="contenedor">
+
+    <!-- Ingreso manual -->
+    <h2>🔗 Unirse a una Sala por ID</h2>
+    <input type="text" id="nombreInput" placeholder="Tu nombre" required style="margin-bottom: 10px; display: block;">
+    <input type="text" id="roomIdInput" placeholder="ID de sala" required style="margin-bottom: 10px;">
+    <button id="joinRoomBtn" class="btn-dorado">🚪 Unirse a la Sala</button>
+
+    <!-- Buscador de salas activas -->
     <h2>🔍 Buscar Sala</h2>
     <input type="text" id="busquedaSala" placeholder="Buscar por nombre del monitor..." />
-       
-    <!-- Justo debajo del input de búsqueda o donde te convenga -->
-<button id="joinRoomBtn" class="btn-dorado">🔗 Unirse a una Sala por ID</button>
-<input id="roomIdInput" type="text" placeholder="ID de sala" />
 
+    <!-- Contador de salas -->
     <h2>🎥 Salas Disponibles</h2>
-
     <div id="contadorSalas" class="barra-contador">
-  📡 Cargando salas activas...
-</div>
-
-    <div id="salasDisponibles">
-      <!-- Aquí se insertan las salas -->
+      📡 Cargando salas activas...
     </div>
 
-    <button class="volver" onclick="window.location.href='index.html'">🔙 Volver al inicio</button>
+    <!-- Lista de salas -->
+    <div id="salasDisponibles">
+      <!-- Aquí se insertan las tarjetas de salas dinámicamente -->
+    </div>
+
   </div>
 
-
-
-  <script>
-    // Esto es para mostrar dinámicamente las salas desde tu lógica existente
-      document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById("joinRoomBtn").addEventListener("click", () => {
-      const roomId = document.getElementById("roomIdInput").value.trim();
-      if (roomId) {
-        window.location.href = `observadores.html?roomId=${roomId}&senderId=observador_${Math.floor(Math.random() * 1000)}`;
-      } else {
-        alert("Por favor ingresa un ID de sala válido.");
-      }
-    });
-      });
-  </script>
-
-
-
-    <script src="firebase-config.js"></script> <!-- 👈 Este archivo contiene tu config e inicialización -->
-
-
-
-
-    <script>
-      // Unirse a la sala con el ID ingresado manualmente
-      document.getElementById("joinRoomBtn").addEventListener("click", (e) => {
-        e.preventDefault();
-    
-        const roomId = document.getElementById("roomIdInput").value.trim();
-        if (!roomId) {
-          alert("Por favor ingresa un ID de sala");
-          return;
-        }
-    
-        // Redirige al observador con roomId y senderId
-        window.location.href = `observadores.html?roomId=${roomId}&senderId=observador123`;
-      });
-    </script>
-    
-
-
-
-<script>
-  const db = firebase.firestore();
-  const contenedorSalas = document.getElementById("salasDisponibles");
-  const inputBusqueda = document.getElementById("busquedaSala");
-
-  let salasOriginales = [];
-
-  function agregarSala(salaData) {
-    const card = document.createElement("div");
-    card.className = "sala-card";
-
-    const estadoIcono = salaData.estado === "activo"
-      ? `<span class="estado-icono" title="Activa">🟢</span>`
-      : `<span class="estado-icono" title="Terminada">🔴</span>`;
-
-    card.innerHTML = `
-      <h3>${salaData.monitor || "Monitor desconocido"} ${estadoIcono}</h3>
-      <p><span class="titulo">ID:</span> ${salaData.roomId}</p>
-      <p><span class="titulo">Observadores:</span> ${salaData.observadores || 0}</p>
-      ${salaData.screenshot ? `<img src="${salaData.screenshot}" style="width:100%;border-radius:8px;margin-bottom:10px;">` : ''}
-      <button onclick="unirseSala('${salaData.roomId}', '${salaData.monitor}')">Ver Sala</button>
-    `;
-
-    contenedorSalas.appendChild(card);
-  }
-
- function renderizarSalas(salas) {
-  const contador = document.getElementById("contadorSalas");
-
-  if (salas.length === 0) {
-    contenedorSalas.innerHTML = "<p style='color:silver;'>No hay salas disponibles.</p>";
-    contador.textContent = "📡 No hay salas activas en este momento.";
-    return;
-  }
-
-  contenedorSalas.innerHTML = "";
-  salas.forEach(sala => agregarSala(sala));
-
-  const activas = salas.filter(s => s.estado === "activo").length;
-  contador.textContent = `📡 ${activas} sala${activas !== 1 ? "s" : ""} activa${activas !== 1 ? "s" : ""} actualmente`;
-}
-
-
-  function unirseSala(roomId, monitor) {
-    if (confirm(`¿Quieres unirte a la sala del monitor: ${monitor}?`)) {
-      const senderId = `obs-${Math.random().toString(36).substring(2, 8)}`;
-      window.location.href = `observadores.html?roomId=${roomId}&senderId=${senderId}`;
-    }
-  }
-
-  db.collection("salas")
-    .orderBy("creadoEn", "desc")
-    .onSnapshot(snapshot => {
-      salasOriginales = [];
-
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        salasOriginales.push({
-          roomId: doc.id,
-          monitor: data.monitor || "Desconocido",
-          estado: data.estado || "terminada",
-          observadores: data.observadores || 0,
-          screenshot: data.screenshot || null
-        });
-      });
-
-      renderizarSalas(salasOriginales);
-    });
-
-  inputBusqueda.addEventListener("input", () => {
-    const filtro = inputBusqueda.value.toLowerCase();
-
-    const filtradas = salasOriginales.filter(sala =>
-      sala.monitor.toLowerCase().includes(filtro)
-    );
-
-    renderizarSalas(filtradas);
-  });
-</script>
-
-
+  <script src="firebase-config.js"></script>
+  <script src="ingreso-observador.js"></script>
   <script src="salas-obser.js"></script>
 
   </body>
