@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="ingreso-observador.css">
     <title>Ingreso como Observador</title>
   </head><body>
+
   <!-- Estado de autenticación -->
   <div id="estadoSesion" style="font-size: 14px; margin-top: 10px; color: #aaa;"></div>
   <button class="volver" onclick="window.location.href='index.html'">🔙 Volver al inicio</button>
@@ -41,9 +42,25 @@
 
   </div>
 
+
   <script src="firebase-config.js"></script>
   <script src="ingreso-observador.js"></script>
   <script src="salas-obser.js"></script>
+<script>
+  document.getElementById("joinRoomBtn").addEventListener("click", () => {
+    const nombre = document.getElementById("nombreInput").value.trim();
+    const roomId = document.getElementById("roomIdInput").value.trim();
+
+    if (!nombre || !roomId) {
+      alert("❗ Por favor ingresa tu nombre y el ID de la sala.");
+      return;
+    }
+
+    // Redirige a observadores.html con los parámetros
+    const url = `observadores.html?roomId=${encodeURIComponent(roomId)}&nombre=${encodeURIComponent(nombre)}`;
+    window.location.href = url;
+  });
+</script>
 
   </body>
 </html>
