@@ -1,3 +1,5 @@
+document.addEventListener("DOMContentLoaded", () => {
+
 // ==========================
 // 🔹 VARIABLES GLOBALES
 // ==========================
@@ -7,10 +9,11 @@ const roomId = urlParams.get("roomId");
 const senderId = urlParams.get("senderId") || `obs_${Math.floor(Math.random() * 10000)}`;
 const socket = new WebSocket("wss://e6e14acd-d62c-4d98-b810-643a81d486b5-00-2nju91dv3rww3.worf.replit.dev/");
 
+// 🌍 Guardar el roomId como global para otros scripts
+window.roomId = roomId;
 // ==========================
 // 🔹 CARGA DEL DOM
 // ==========================
-document.addEventListener("DOMContentLoaded", () => {
   const remoteVideo = document.getElementById("remoteVideo");
 
   // ==========================

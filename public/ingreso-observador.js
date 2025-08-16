@@ -1,3 +1,4 @@
+// ingreso-observador.js
 const db = firebase.firestore();
 const contenedorSalas = document.getElementById("salasDisponibles");
 const inputBusqueda = document.getElementById("busquedaSala");
@@ -8,13 +9,11 @@ const nombreInput = document.getElementById("nombreInput");
 
 let salasOriginales = [];
 
-// 🔍 Escuchar salas activas
 db.collection("salas")
-  .where("estado", "==", "activa")
+  .where("estado", "in", ["activa", "activo"])
   .orderBy("creadoEn", "desc")
   .onSnapshot(snapshot => {
     salasOriginales = [];
-
     snapshot.forEach(doc => {
       const data = doc.data();
       salasOriginales.push({
@@ -25,45 +24,38 @@ db.collection("salas")
         screenshot: data.screenshot || null
       });
     });
-
     renderizarSalas(salasOriginales);
   });
 
 function agregarSala(salaData) {
   const card = document.createElement("div");
   card.className = "sala-card";
-
   card.innerHTML = `
-    <h3>${salaData.monitor || "Monitor desconocido"} 🟢</h3>
+    <h3>${salaData.monitor} 🟢</h3>
     <p><span class="titulo">ID:</span> ${salaData.roomId}</p>
-    <p><span class="titulo">Observadores:</span> ${salaData.observadores || 0}</p>
+    <p><span class="titulo">Observadores:</span> ${salaData.observadores}</p>
     ${salaData.screenshot ? `<img src="${salaData.screenshot}" style="width:100%;border-radius:8px;margin-bottom:10px;">` : ''}
     <button onclick="seleccionarSala('${salaData.roomId}')">Ver Sala</button>
   `;
-
   contenedorSalas.appendChild(card);
 }
 
 function renderizarSalas(salas) {
   if (salas.length === 0) {
     contenedorSalas.innerHTML = "<p style='color:silver;'>No hay salas activas disponibles.</p>";
-    contador.textContent = "📡 No hay salas activas en este momento.";
+    contador.textContent = "📡 No hay salas activas.";
     return;
   }
-
   contenedorSalas.innerHTML = "";
   salas.forEach(sala => agregarSala(sala));
-
-  contador.textContent = `📡 ${salas.length} sala${salas.length !== 1 ? "s" : ""} activa${salas.length !== 1 ? "s" : ""} actualmente`;
+  contador.textContent = `📡 ${salas.length} sala${salas.length !== 1 ? "s" : ""} activa${salas.length !== 1 ? "s" : ""}`;
 }
 
-// ✅ Al hacer clic en una sala, llenamos el input automáticamente
 function seleccionarSala(roomId) {
   roomIdInput.value = roomId;
-  validarCampos(); // Verifica si se puede habilitar el botón
+  validarCampos();
 }
 
-// 🔍 Filtro de búsqueda
 inputBusqueda.addEventListener("input", () => {
   const filtro = inputBusqueda.value.toLowerCase();
   const filtradas = salasOriginales.filter(sala =>
@@ -72,60 +64,50 @@ inputBusqueda.addEventListener("input", () => {
   renderizarSalas(filtradas);
 });
 
-// 🔒 Estado de sesión
 firebase.auth().onAuthStateChanged(user => {
   const estadoSesion = document.getElementById("estadoSesion");
   if (user) {
     estadoSesion.textContent = `✅ Autenticado como: ${user.displayName || "Usuario"} (UID: ${user.uid})`;
     estadoSesion.style.color = "green";
   } else {
-    estadoSesion.textContent = "❌ No autenticado. Es necesario iniciar sesión.";
+    estadoSesion.textContent = "❌ No autenticado.";
     estadoSesion.style.color = "red";
   }
 });
 
-// ✅ Validar campos para habilitar el botón
 function validarCampos() {
   const nombre = nombreInput.value.trim();
   const roomId = roomIdInput.value.trim();
-
   joinBtn.disabled = !(nombre && roomId);
 }
 
-// Escuchar cambios en los inputs para habilitar/deshabilitar botón
 [nombreInput, roomIdInput].forEach(input =>
   input.addEventListener("input", validarCampos)
 );
 
-// 🚪 Ingreso manual a la sala
 joinBtn.addEventListener("click", async (e) => {
   e.preventDefault();
-
   const roomId = roomIdInput.value.trim();
   const nombre = nombreInput.value.trim();
-
   if (!roomId || !nombre) {
-    alert("Por favor ingresa el ID de la sala y tu nombre.");
+    alert("Por favor ingresa el ID y tu nombre.");
     return;
   }
-
   try {
     const salaDoc = await db.collection("salas").doc(roomId).get();
     if (!salaDoc.exists) {
       alert("⚠️ La sala no existe.");
       return;
     }
-
     const data = salaDoc.data();
-    if (data.estado !== "activa") {
+    if (!(data.estado === "activa" || data.estado === "activo")) {
       alert("⚠️ Esta sala ya no está activa.");
       return;
     }
-
     const senderId = `obs_${Math.random().toString(36).substring(2, 8)}`;
     window.location.href = `observadores.html?roomId=${roomId}&senderId=${senderId}&nombre=${encodeURIComponent(nombre)}`;
   } catch (err) {
     console.error("❌ Error verificando la sala:", err);
-    alert("❌ Ocurrió un error al intentar verificar la sala.");
+    alert("Error interno al verificar la sala.");
   }
 });

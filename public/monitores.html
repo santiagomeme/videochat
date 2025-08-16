@@ -51,19 +51,35 @@
   </main>
 
   <canvas id="capturaCanvas" style="display:none;"></canvas>
-</div>
 
-<div class="panel-observadores">
+ 
+<section class="chat-panel">
+  <h3>Chat de la sala</h3>
+  <div class="chat-scroll">
+    <ul id="chatList" class="chat-list"></ul>
+  </div>
+  <form id="chatForm" class="chat-form" autocomplete="off">
+    <input id="chatInput" type="text" placeholder="Escribe un mensaje..." maxlength="500" required />
+    <button type="submit">Enviar</button>
+  </form>
+</section>
+
+
+ <div class="panel-observadores">
   <h3>👁️ Observadores Conectados: <span id="totalObservadores">0</span></h3>
   <ul id="listaObservadores"></ul>
 </div>
+
+</div>
+
+
 
 
 
  <script defer src="firebase-config.js"></script> <!-- 👈 Este archivo contiene tu config e inicialización -->
     <script defer src="iceServers.js"></script>
     <script defer src="monitor.js"></script>
-
+    
 <script>
   document.addEventListener("DOMContentLoaded", () => {
     // 1. Obtener parámetros de la URL

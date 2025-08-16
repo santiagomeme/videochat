@@ -1,44 +1,32 @@
-// observador.js (versión corregida)
-// ================
-// Encapsulado para evitar variables globales que choquen con observadorRTC.js u otros scripts.
-
+// observador.js
 document.addEventListener("DOMContentLoaded", () => {
   (async () => {
-    // --- Parámetros de URL y state local ---
     const urlParams = new URLSearchParams(window.location.search);
     const roomId = urlParams.get("roomId");
     let senderId = urlParams.get("senderId") || null;
     let nombre = urlParams.get("nombre") ? decodeURIComponent(urlParams.get("nombre")) : "";
 
-    // Recuperar senderId / nombre desde localStorage si existe (para reconexiones)
+    // Persistencia local para reconexión
     const savedId = localStorage.getItem("senderId");
     if (!senderId && savedId) senderId = savedId;
-
     if (!senderId) {
       senderId = `obs_${Math.random().toString(36).substring(2, 8)}`;
-      localStorage.setItem("senderId", senderId);
-    } else {
-      localStorage.setItem("senderId", senderId);
     }
+    localStorage.setItem("senderId", senderId);
 
     const savedName = localStorage.getItem("observerName");
     if (!nombre && savedName) nombre = savedName;
     if (nombre) localStorage.setItem("observerName", nombre);
 
-    // --- Helpers de UI / modal ---
-    function fallbackAlertAndRedirect(msg) {
-      alert(msg);
-      window.location.href = "ingreso-observador.html";
-    }
-
+    // Helpers
     function mostrarModal(mensaje) {
       const modal = document.getElementById("modalError");
       const mensajeTexto = document.getElementById("modalMensaje");
       const btnCerrar = document.getElementById("cerrarModal");
 
       if (!modal || !mensajeTexto || !btnCerrar) {
-        // Si no existe modal en el HTML, fallback a alert + redirect
-        fallbackAlertAndRedirect(mensaje);
+        alert(mensaje);
+        window.location.href = "ingreso-observador.html";
         return;
       }
 
@@ -51,61 +39,51 @@ document.addEventListener("DOMContentLoaded", () => {
       };
     }
 
-    // --- Validaciones iniciales ---
     if (!roomId) {
       mostrarModal("❌ No se especificó ningún ID de sala.");
       return;
     }
 
-    // Mostrar nombre del observador en UI (si existe elemento)
     const nombreSpan = document.getElementById("observerName");
     if (nombreSpan) nombreSpan.textContent = nombre || "Observador";
 
-    // Mostrar roomId en UI si hay elemento
     const roomIdTextEl = document.getElementById("roomIdText");
     if (roomIdTextEl) roomIdTextEl.textContent = roomId;
 
-    // --- Verificar sala en Firestore ---
+    // Verificar sala en Firestore
     if (window.firebase && firebase.firestore) {
       try {
         const db = firebase.firestore();
         const doc = await db.collection("salas").doc(roomId).get();
 
         if (!doc.exists) {
-          mostrarModal("Esta sala no existe. Por favor verifica el ID.");
+          mostrarModal("Esta sala no existe.");
           return;
         }
 
         const data = doc.data();
-        // Acepta tanto "activa" como "activo" por compatibilidad (tu código lo usa a veces distinto)
         const estado = (data && data.estado) || "";
         if (!(estado.toLowerCase() === "activa" || estado.toLowerCase() === "activo")) {
           mostrarModal("⚠️ Esta sala ya no está activa.");
           return;
         }
 
-        // Poner datos del monitor en UI
+        // Mostrar nombre del monitor
         const monitorText = document.getElementById("monitorName");
         if (monitorText) monitorText.textContent = data.monitor || "Desconocido";
 
-        // Poner screenshot si existe
+        // Mostrar screenshot
         const screenshotImg = document.getElementById("monitorScreenshot");
         if (screenshotImg && data.screenshot) screenshotImg.src = data.screenshot;
 
       } catch (err) {
         console.error("❌ Error verificando la sala en Firestore:", err);
-        mostrarModal("❌ No se pudo verificar el estado de la sala (error interno).");
+        mostrarModal("No se pudo verificar el estado de la sala.");
         return;
       }
-    } else {
-      console.warn("⚠️ Firebase/Firestore no disponible en esta página.");
-      // opcionalmente permitir continuar sin Firestore
     }
 
-    // --- No abrimos WebSocket aquí (observadorRTC.js debe manejarlo).
-    // Observador.js solo gestiona UI, validación y almacenamiento local para reconexión.
-
-    // Mostrar estado de autenticación en la UI si existe #estadoSesion
+    // Estado de autenticación
     if (window.firebase && firebase.auth) {
       firebase.auth().onAuthStateChanged(user => {
         const estadoSesion = document.getElementById("estadoSesion");
@@ -114,7 +92,6 @@ document.addEventListener("DOMContentLoaded", () => {
           const display = user.displayName || nombre || "Observador";
           estadoSesion.textContent = `✅ Autenticado como: ${display} (UID: ${user.uid})`;
           estadoSesion.style.color = "green";
-          // si aún no hay nombre, puedes preferir usar displayName:
           if (!nombre && display) {
             nombre = display;
             localStorage.setItem("observerName", nombre);
@@ -127,9 +104,75 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    // --- Log para debugging ---
     console.log("🔎 Observador listo:", { roomId, senderId, nombre });
 
-    // FIN del flujo principal
+    // =====================================
+    // DEFINICIÓN DEL SOCKET (Faltaba esto)
+    // =====================================
+  socket = new WebSocket("wss://e6e14acd-d62c-4d98-b810-643a81d486b5-00-2nju91dv3rww3.worf.replit.dev/");
+
+    socket.addEventListener("open", () => {
+      console.log("✅ Conectado al servidor WebSocket");
+      // Unirse automáticamente a la sala
+      socket.send(JSON.stringify({
+        type: "joinRoom",
+        role: "observador",
+        roomId,
+        senderId,
+        nombre
+      }));
+    });
+
+    socket.addEventListener("close", () => {
+      console.log("❌ Conexión cerrada con el servidor WebSocket");
+    });
+
+    socket.addEventListener("error", (err) => {
+      console.error("⚠️ Error en WebSocket:", err);
+    });
+
+    // =====================================
+    // CHAT: ENVÍO Y RECEPCIÓN DE MENSAJES
+    // =====================================
+
+    // Variables del HTML
+    const chatForm = document.getElementById("chatForm");
+    const chatInput = document.getElementById("chatInput");
+    const chatList = document.getElementById("chatList");
+
+    // Escuchar envío de mensajes
+    chatForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const mensaje = chatInput.value.trim();
+      if (!mensaje) return;
+
+      if (socket.readyState !== WebSocket.OPEN) {
+        alert("⚠️ No hay conexión con el servidor");
+        return;
+      }
+
+      // Enviar mensaje al servidor vía WebSocket
+      socket.send(JSON.stringify({
+        type: "chat",
+        roomId,
+        senderId,
+        nombre,
+        mensaje
+      }));
+
+      chatInput.value = ""; // limpiar input
+    });
+
+    // Escuchar mensajes entrantes
+    socket.addEventListener("message", (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === "chat") {
+        const li = document.createElement("li");
+        li.textContent = `${data.nombre}: ${data.mensaje}`;
+        chatList.appendChild(li);
+        chatList.scrollTop = chatList.scrollHeight;
+      }
+    });
+
   })();
 });

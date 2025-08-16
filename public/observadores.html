@@ -53,10 +53,21 @@
   </div>
 </div>
 
+<section class="chat-panel">
+  <h3>Chat de la sala</h3>
+  <div class="chat-scroll">
+    <ul id="chatList" class="chat-list"></ul>
+  </div>
+  <form id="chatForm" class="chat-form" autocomplete="off">
+    <input id="chatInput" type="text" placeholder="Escribe un mensaje..." maxlength="500" required />
+    <button type="submit">Enviar</button>
+  </form>
+</section>
 
   <script src="firebase-config.js"></script> <!-- 👈 Este archivo contiene tu config e inicialización -->
     <script src="iceServers.js"></script>
     <script src="observador.js"></script> 
+    <script src="mensajes.js"></script>
     <script src="observadorRTC.js"></script>
 
 
