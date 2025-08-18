@@ -1,0 +1,204 @@
+
+.chat-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 420px;
+  height: 100%;
+margin: 100px auto 100px auto;
+ /* 100px arriba, auto a los lados */
+  box-shadow:
+    0 0 20px rgba(255, 215, 0, 0.4),
+    0 0 40px rgba(255, 215, 0, 0.2);
+  padding: 20px; /* reduce padding para que no se vea inflado */
+  background: #000; /* fondo negro elegante */
+  border-radius: 10px;
+}
+
+.chat-scroll {
+  flex: 1;
+  overflow-y: auto;
+  border: 1px solid #444;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  min-height: 180px;
+  max-height: 40vh;
+  background: #000; /* fondo negro */
+  color: #FFD700;   /* texto dorado */
+}
+
+
+.chat-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.chat-msg {
+  background: #000000;
+  border-radius: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.03);
+}
+
+.chat-msg .autor {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color:#fff
+}
+
+.chat-msg .texto {
+  font-size: 0.95rem;
+  word-wrap: anywhere;
+}
+
+.chat-msg .hora {
+  font-size: 0.90rem;
+  opacity: 0.7;
+  text-align: right;
+  color:gold;
+}
+
+.chat-form {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.chat-form input {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+}
+
+.chat-form button {
+  padding: 0.5rem 0.9rem;
+  border: none;
+  border-radius: 0.5rem;
+  background: #000000;
+  color: #fff;
+  cursor: pointer;
+  box-shadow:
+    0 0 20px rgba(255, 215, 0, 0.4),
+    0 0 40px rgba(255, 215, 0, 0.2);
+
+
+}
+
+.chat-form button:hover {
+  opacity: 0.9;
+  background: gold;
+  color:#000000
+
+}
+.monitor-message {
+  background-color: transparent;
+  color: #FFD700; /* dorado */
+  font-weight: bold;
+  text-align: right; /* alineado a la derecha */
+}
+
+.observador-message {
+  background-color: transparent;
+  color: #fff; /* blanco/gris para contraste */
+  text-align: left; /* alineado a la izquierda */
+}
+.monitor-message:hover {
+  text-shadow: 0 0 8px gold;
+}
+.observador-message:hover {
+  text-shadow: 0 0 8px gold;
+}
+
+
+
+/* Contenedor del chat para burbujas en los mensajes */
+.chat-container {
+  background-color: #000; /* Fondo negro */
+  padding: 10px;
+  height: 400px;
+  overflow-y: auto;
+  border-radius: 10px;
+}
+
+/* Estilo general de los mensajes */
+.message {
+  max-width: 70%;
+  padding: 10px 15px;
+  margin: 8px 0;
+  border-radius: 20px;
+  font-size: 14px;
+  word-wrap: break-word;
+  display: inline-block;
+  color: #fff;
+
+}
+
+/* Mensajes enviados (del usuario) */
+.message.sent {
+  background-color: #ffd700; /* Dorado */
+  color: #000; /* Texto negro para contraste */
+  align-self: flex-end;
+  text-align: right;
+  float: right;
+  clear: both;
+}
+
+/* Mensajes recibidos */
+.message.received {
+  background-color: #333; /* Gris oscuro */
+  color: #ffd700; /* Texto dorado */
+  align-self: flex-start;
+  text-align: left;
+  float: left;
+  clear: both;
+}
+
+/* Scroll bonito */
+.chat-container::-webkit-scrollbar {
+  width: 6px;
+}
+.chat-container::-webkit-scrollbar-thumb {
+  background-color: #444;
+  border-radius: 10px;
+}
+
+
+/* Estilo base */
+#chat {
+  background: #000; /* Fondo negro */
+  color: #fff; /* Texto blanco por defecto */
+  padding: 10px;
+  height: 400px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Burbuja base */
+.mensaje {
+  max-width: 70%;
+  padding: 10px;
+  margin: 5px;
+  border-radius: 12px;
+  word-wrap: break-word;
+}
+
+/* Burbujas propias (usuario actual) */
+.chat-msg.propio {
+  align-self: flex-end;
+  background: #FFD700; /* dorado */
+  color: #000; /* texto negro para contraste */
+  border-radius: 12px 12px 0 12px;
+}
+
+/* Burbujas ajenas */
+.chat-msg.ajeno {
+  align-self: flex-start;
+  background: #333; /* gris oscuro */
+  color: #fff;
+  border-radius: 12px 12px 12px 0;
+}

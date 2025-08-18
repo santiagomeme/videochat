@@ -99,6 +99,8 @@ body {
     0 0 10px rgba(255, 215, 0, 0.6),
     0 0 30px rgba(255, 215, 0, 0.4),
     0 0 50px rgba(255, 215, 0, 0.2);
+    top:100px;
+    bottom: 100px;
 }
 
 .btn-dorado:hover {
@@ -131,8 +133,8 @@ video {
   border-radius: 8px;
   padding: 10px;
   background: #000000;
-  margin-top: 15px;
-  margin-bottom: 20px;
+  top: 15px;
+  bottom: 20px;
   max-width: 300px;
     box-shadow:
     0 0 20px rgba(255, 215, 0, 0.4),
@@ -143,91 +145,3 @@ video {
   padding-left: 20px;
 }
 
-
-.chat-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  max-width: 420px;
-  height: 100%;
-}
-
-.chat-scroll {
-  flex: 1;
-  overflow-y: auto;
-  border: 1px solid #ddd;
-  border-radius: 0.5rem;
-  padding: 0.5rem;
-  min-height: 180px;
-  max-height: 40vh;
-  background: #fff;
-}
-
-.chat-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.chat-msg {
-  background: #f7f7f7;
-  border-radius: 0.5rem;
-  padding: 0.4rem 0.6rem;
-  box-shadow: 0 1px 0 rgba(0,0,0,0.03);
-}
-
-.chat-msg .autor {
-  font-weight: 600;
-  font-size: 0.9rem;
-}
-
-.chat-msg .texto {
-  font-size: 0.95rem;
-  word-wrap: anywhere;
-}
-
-.chat-msg .hora {
-  font-size: 0.75rem;
-  opacity: 0.7;
-  text-align: right;
-}
-
-.chat-form {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.chat-form input {
-  flex: 1;
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 0.5rem;
-}
-
-.chat-form button {
-  padding: 0.5rem 0.9rem;
-  border: none;
-  border-radius: 0.5rem;
-  background: #2563eb;
-  color: #fff;
-  cursor: pointer;
-}
-
-.chat-form button:hover {
-  opacity: 0.9;
-}
-.monitor-message {
-    background-color: #d1f0d1;
-    padding: 5px;
-    border-radius: 5px;
-    margin: 3px 0;
-}
-.observador-message {
-    background-color: #f0f0f0;
-    padding: 5px;
-    border-radius: 5px;
-    margin: 3px 0;
-}

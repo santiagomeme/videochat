@@ -112,6 +112,8 @@ document.addEventListener("DOMContentLoaded", () => {
         senderId: monitorId, 
         nombre: monitorNombre 
       });
+      
+ 
     });
 
     socket.addEventListener("message", handleSocketMessage);
@@ -185,39 +187,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // =====================
-  // CHAT
-  // =====================
-  const chatForm = document.getElementById("chatForm");
-  const chatInput = document.getElementById("chatInput");
-  const chatList = document.getElementById("chatList");
 
-  if (chatForm) {
-    chatForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const mensaje = chatInput.value.trim();
-      if (!mensaje) return;
 
-      enviarMensaje({
-        type: "chat",
-        roomId,
-        senderId: monitorId,
-        nombre: monitorNombre,
-        mensaje
-      });
-
-      chatInput.value = "";
-      mostrarMensaje({ nombre: monitorNombre, mensaje }, true); // mensaje propio
-    });
-  }
-
-  function mostrarMensaje(data, esPropio = false) {
-    const li = document.createElement("li");
-    li.className = esPropio ? "mensaje-propio" : "mensaje";
-    li.textContent = `${data.nombre}: ${data.mensaje}`;
-    chatList.appendChild(li);
-    chatList.scrollTop = chatList.scrollHeight;
-  }
 
   // =====================
   // CAPTURAR IMAGEN
@@ -326,4 +297,78 @@ document.addEventListener("DOMContentLoaded", () => {
       window.location.href = "index.html";
     }
   });
+
+
+
+  // =====================
+  // FUNCIONES CHAT
+  // =====================
+  function crearWebSocket() {
+    socket = new WebSocket("wss://e6e14acd-d62c-4d98-b810-643a81d486b5-00-2nju91dv3rww3.worf.replit.dev/");
+
+    socket.addEventListener("open", () => {
+      console.log("WebSocket conectado");
+      // El monitor se une a la sala
+      enviarMensaje({ type: "joinRoom", role: "monitor", roomId, senderId: monitorId, nombre: monitorNombre });
+    });
+
+    socket.addEventListener("message", handleSocketMessage);
+
+    socket.addEventListener("close", () => {
+      console.warn("WebSocket cerrado, intentando reconectar...");
+      setTimeout(crearWebSocket, 3000);
+    });
+  }
+
+  function enviarMensaje(msg) {
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      socket.send(JSON.stringify(msg));
+    }
+  }
+
+  function handleSocketMessage(event) {
+    const data = JSON.parse(event.data);
+
+    if (data.type === "chat" && data.roomId === roomId) {
+      const esPropio = data.senderId === monitorId;
+      addMessage(data.nombre, data.mensaje, esPropio);
+    }
+  }
+
+  function addMessage(nombre, mensaje, esPropio = false) {
+    const li = document.createElement("li");
+    li.classList.add("chat-msg");
+    li.classList.add(esPropio ? "propio" : "ajeno");
+
+    li.innerHTML = `
+      <div class="autor">${nombre}</div>
+      <div class="texto">${mensaje}</div>
+    `;
+
+    chatList.appendChild(li);
+    chatList.scrollTop = chatList.scrollHeight;
+  }
+
+  // =====================
+  // EVENTO ENVÍO MENSAJE
+  // =====================
+  if (chatForm) {
+    chatForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const mensaje = chatInput.value.trim();
+      if (!mensaje || !socket) return;
+
+      enviarMensaje({ type: "chat", roomId, senderId: monitorId, nombre: monitorNombre, mensaje });
+      addMessage(monitorNombre, mensaje, true); // mostrar propio
+      chatInput.value = "";
+    });
+  }
+
+  // =====================
+  // INICIAR SOCKET
+  // =====================
+  crearWebSocket();
 });
+
+
+

@@ -17,7 +17,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const savedName = localStorage.getItem("observerName");
     if (!nombre && savedName) nombre = savedName;
     if (nombre) localStorage.setItem("observerName", nombre);
-
+   // =====================================
+    // FUNCIÓN: MOSTRAR MODAL DE ERROR
+    // =====================================
     // Helpers
     function mostrarModal(mensaje) {
       const modal = document.getElementById("modalError");
@@ -38,7 +40,10 @@ document.addEventListener("DOMContentLoaded", () => {
         window.location.href = "ingreso-observador.html";
       };
     }
-
+  
+    // =====================================
+    // VALIDAR ROOMID
+    // =====================================
     if (!roomId) {
       mostrarModal("❌ No se especificó ningún ID de sala.");
       return;
@@ -49,8 +54,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const roomIdTextEl = document.getElementById("roomIdText");
     if (roomIdTextEl) roomIdTextEl.textContent = roomId;
-
-    // Verificar sala en Firestore
+    // =====================================
+    // VERIFICAR SALA EN FIRESTORE
+    // =====================================
     if (window.firebase && firebase.firestore) {
       try {
         const db = firebase.firestore();
@@ -81,8 +87,10 @@ document.addEventListener("DOMContentLoaded", () => {
         mostrarModal("No se pudo verificar el estado de la sala.");
         return;
       }
-    }
-
+    }// <-- cierre verificación Firestore
+ // =====================================
+    // ESTADO DE AUTENTICACIÓN
+    // =====================================
     // Estado de autenticación
     if (window.firebase && firebase.auth) {
       firebase.auth().onAuthStateChanged(user => {
@@ -102,7 +110,7 @@ document.addEventListener("DOMContentLoaded", () => {
           estadoSesion.style.color = "red";
         }
       });
-    }
+    } // <-- cierre auth
 
     console.log("🔎 Observador listo:", { roomId, senderId, nombre });
 
@@ -131,48 +139,64 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("⚠️ Error en WebSocket:", err);
     });
 
-    // =====================================
-    // CHAT: ENVÍO Y RECEPCIÓN DE MENSAJES
-    // =====================================
+    
+  // =====================
+  // FUNCIONES CHAT
+  // =====================//Variables del HTML 
+  const chatForm = document.getElementById("chatForm"); 
+  const chatInput = document.getElementById("chatInput");
+   const chatList = document.getElementById("chatList"); // 👉 este es tu contenedor real 
+   // Escuchar envío de mensajes 
+   chatForm.addEventListener("submit", (e) => {
+     e.preventDefault(); const mensaje = chatInput.value.trim();
+      if (!mensaje) return; 
+      
+      if (socket.readyState !== WebSocket.OPEN)
+         { alert("⚠️ No hay conexión con el servidor");
+           return; } // Enviar mensaje al servidor vía WebSocket
+          socket.send(JSON.stringify({
+             type: "chat", 
+             roomId,
+             senderId, 
+             nombre,
+             mensaje }));
+              // 👉 Mostrar el mensaje propio en el chat inmediatamente 
+          addMessage(nombre, mensaje, true);
+           chatInput.value = ""; // limpiar input
+            }); 
+           // Escuchar mensajes entrantes  
+          socket.addEventListener("message", (event) => {
+             const data = JSON.parse(event.data); 
+            if (data.type === "chat") { // 👉 Mostrar mensajes de otros 
+            if (data.senderId !== senderId) 
+              { addMessage(data.nombre, data.mensaje, false);
 
-    // Variables del HTML
-    const chatForm = document.getElementById("chatForm");
-    const chatInput = document.getElementById("chatInput");
-    const chatList = document.getElementById("chatList");
+               }
+             }
+           });
+             // ===================================== 
+             // // FUNCIÓN PARA RENDERIZAR BURBUJAS 
+             // ===================================== 
+             
+             function addMessage(nombre, mensaje, esPropio = false){
+               const li = document.createElement("li"); 
+              li.classList.add("chat-msg"); 
+              // 👉 Diferenciar con clases 
+              if (esPropio){ 
+                li.classList.add("propio"); //burbuja mía
+               } else {
+                 li.classList.add("ajeno"); // burbuja de otros 
+               } 
+               // Autor + texto 
 
-    // Escuchar envío de mensajes
-    chatForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const mensaje = chatInput.value.trim();
-      if (!mensaje) return;
+              li.innerHTML = `
+               <div class="autor">${nombre}</div>
+               <div class="texto">${mensaje}</div>`;
+               chatList.appendChild(li); 
+               chatList.scrollTop = chatList.scrollHeight; 
+               // scroll automático
+                }
 
-      if (socket.readyState !== WebSocket.OPEN) {
-        alert("⚠️ No hay conexión con el servidor");
-        return;
-      }
-
-      // Enviar mensaje al servidor vía WebSocket
-      socket.send(JSON.stringify({
-        type: "chat",
-        roomId,
-        senderId,
-        nombre,
-        mensaje
-      }));
-
-      chatInput.value = ""; // limpiar input
-    });
-
-    // Escuchar mensajes entrantes
-    socket.addEventListener("message", (event) => {
-      const data = JSON.parse(event.data);
-      if (data.type === "chat") {
-        const li = document.createElement("li");
-        li.textContent = `${data.nombre}: ${data.mensaje}`;
-        chatList.appendChild(li);
-        chatList.scrollTop = chatList.scrollHeight;
-      }
-    });
-
-  })();
+              
+    })();
 });
